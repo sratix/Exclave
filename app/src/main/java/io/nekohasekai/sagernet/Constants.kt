@@ -248,6 +248,7 @@ object Key {
     const val SERVER_UDPGW_ADDRESS = "serverUdpgwAddress"
     const val SERVER_UDPGW_PORT = "serverUdpgwPort"
     const val SERVER_UDPGW_MAX_CONNECTIONS = "serverUdpgwMaxConnections"
+    const val SERVER_SSH_CONNECTION_COUNT = "serverSSHConnectionCount"
 
     const val SERVER_PORTS = "serverPorts"
     const val SERVER_HOP_INTERVAL = "serverHopInterval"

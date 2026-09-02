@@ -2058,6 +2058,43 @@ fun buildV2RayConfig(
                     chainOutbounds.add(currentOutbound)
                     pastExternal = proxyEntity.needExternal()
                     pastOutbound = currentOutbound
+
+                    // SSH funnels every stream through a single TCP connection, so one congested
+                    // flow throttles everything behind it. Emitting the outbound more than once
+                    // gives the core one SSH session per copy, and a balancer spreads new
+                    // connections across them. Only for a single-hop profile: mid-chain hops are
+                    // referenced by tag through proxySettings, which cannot name a balancer.
+                    val sshConnections = (bean as? SSHBean)?.connectionCount ?: 1
+                    if (sshConnections > 1 && !isBalancer && profileList.size == 1) {
+                        val siblingTags = mutableListOf(tagIn)
+                        for (n in 2..sshConnections) {
+                            val clone = gson.fromJson(
+                                gson.toJson(currentOutbound), OutboundObject::class.java
+                            ).apply { init() }
+                            clone.tag = "$tagIn-conn$n"
+                            siblingTags.add(clone.tag)
+                            outbounds.add(clone)
+                        }
+
+                        if (routing.balancers == null) routing.balancers = ArrayList()
+                        routing.balancers.add(RoutingObject.BalancerObject().apply {
+                            tag = "balancer-$tagIn"
+                            selector = siblingTags
+                            // No observer is set up for these: they are the same server reached the
+                            // same way, so probing them against each other would only add traffic.
+                            strategy = StrategyObject().apply {
+                                type = "random"
+                            }
+                        })
+
+                        if (tagOutbound == TAG_AGENT) {
+                            rootBalancer = RoutingObject.RuleObject().apply {
+                                type = "field"
+                                network = "tcp,udp"
+                                balancerTag = "balancer-$tagIn"
+                            }
+                        }
+                    }
                 }
 
             }

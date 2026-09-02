@@ -65,6 +65,14 @@
             app:key="serverSSHKeepaliveInterval"
             app:title="@string/ssh_keepalive_interval"
             app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:dialogMessage="@string/ssh_connection_count_sum"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="serverSSHConnectionCount"
+            app:singleLineTitle="false"
+            app:title="@string/ssh_connection_count"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/udpgw_settings">

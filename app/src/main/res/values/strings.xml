@@ -610,6 +610,8 @@
     <string name="hysteria2_omit_max_datagram_frame_size_sum">If the Hysteria 2 server does not support this breaking change, UDP will be unusable. This is a temporary option and may be removed in the future.</string>
     <string name="ssh_keepalive_interval">Keepalive interval (s)</string>
 
+    <string name="ssh_connection_count">Parallel connections</string>
+    <string name="ssh_connection_count_sum">Open this many SSH connections to the server and spread new streams across them. SSH carries everything over one TCP connection, so a single congested stream slows the rest; more connections raise aggregate throughput. It does not speed up one single download. Costs one login per connection, and the server\'s MaxSessions still applies.</string>
     <string name="udpgw_settings">UDP gateway</string>
     <string name="udpgw_enable">Enable UDP gateway</string>
     <string name="udpgw_enable_sum">Carry UDP traffic over the tunnel using a badvpn-udpgw server, so TCP-only protocols such as SSH can still pass gaming, VoIP and DNS traffic.</string>

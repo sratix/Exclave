@@ -46,6 +46,7 @@ public class SSHBean extends AbstractBean {
     public String udpgwAddress;
     public Integer udpgwPort;
     public Integer udpgwMaxConnections;
+    public Integer connectionCount;
 
     @Override
     public void initializeDefaultValues() {
@@ -64,11 +65,12 @@ public class SSHBean extends AbstractBean {
         if (udpgwAddress == null) udpgwAddress = "127.0.0.1";
         if (udpgwPort == null) udpgwPort = 7300;
         if (udpgwMaxConnections == null) udpgwMaxConnections = 100;
+        if (connectionCount == null) connectionCount = 1;
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(2);
+        output.writeInt(3);
         super.serialize(output);
         output.writeString(username);
         output.writeInt(authType);
@@ -89,6 +91,7 @@ public class SSHBean extends AbstractBean {
         output.writeString(udpgwAddress);
         output.writeInt(udpgwPort);
         output.writeInt(udpgwMaxConnections);
+        output.writeInt(connectionCount);
     }
 
     @Override
@@ -118,6 +121,9 @@ public class SSHBean extends AbstractBean {
             udpgwPort = input.readInt();
             udpgwMaxConnections = input.readInt();
         }
+        if (version >= 3) {
+            connectionCount = input.readInt();
+        }
     }
 
 
@@ -132,6 +138,7 @@ public class SSHBean extends AbstractBean {
         bean.udpgwAddress = udpgwAddress;
         bean.udpgwPort = udpgwPort;
         bean.udpgwMaxConnections = udpgwMaxConnections;
+        bean.connectionCount = connectionCount;
     }
 
 

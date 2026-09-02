@@ -50,6 +50,7 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         DataStore.serverUdpgwAddress = udpgwAddress
         DataStore.serverUdpgwPort = udpgwPort
         DataStore.serverUdpgwMaxConnections = udpgwMaxConnections
+        DataStore.serverSSHConnectionCount = connectionCount
     }
 
     override fun SSHBean.serialize() {
@@ -75,6 +76,7 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         udpgwAddress = DataStore.serverUdpgwAddress
         udpgwPort = DataStore.serverUdpgwPort
         udpgwMaxConnections = DataStore.serverUdpgwMaxConnections
+        connectionCount = DataStore.serverSSHConnectionCount.coerceIn(1, 10)
     }
 
     override fun PreferenceFragmentCompat.createPreferences(
@@ -95,6 +97,9 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
             summaryProvider = PasswordSummaryProvider
         }
         findPreference<EditTextPreference>(Key.SERVER_SSH_KEEPALIVE_INTERVAL)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        }
+        findPreference<EditTextPreference>(Key.SERVER_SSH_CONNECTION_COUNT)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
         }
         findPreference<EditTextPreference>(Key.SERVER_UDPGW_PORT)!!.apply {

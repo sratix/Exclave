@@ -413,6 +413,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverUdpgwAddress by profileCacheStore.string(Key.SERVER_UDPGW_ADDRESS)
     var serverUdpgwPort by profileCacheStore.stringToInt(Key.SERVER_UDPGW_PORT) { UdpgwBridge.DEFAULT_PORT }
     var serverUdpgwMaxConnections by profileCacheStore.stringToInt(Key.SERVER_UDPGW_MAX_CONNECTIONS) { UdpgwBridge.DEFAULT_MAX_CONNECTIONS }
+    var serverSSHConnectionCount by profileCacheStore.stringToInt(Key.SERVER_SSH_CONNECTION_COUNT) { 1 }
 
     var serverNaiveNoPostQuantum by profileCacheStore.boolean(Key.SERVER_NAIVE_NO_POST_QUANTUM)
     var serverSingUot by profileCacheStore.boolean(Key.SERVER_SING_UOT)
