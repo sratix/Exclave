@@ -1344,6 +1344,9 @@ fun buildV2RayConfig(
                                         if (bean.keepaliveInterval > 0) {
                                             keepaliveInterval = bean.keepaliveInterval
                                         }
+                                        if (bean.clientVersion.isNotEmpty()) {
+                                            clientVersion = bean.clientVersion
+                                        }
                                     })
                             } else if (bean is Hysteria2Bean) {
                                 protocol = "hysteria2"

@@ -54,6 +54,7 @@ public class SSHBean extends AbstractBean {
     public Integer udpgwMaxConnections;
     public Integer connectionCount;
     public Integer mtuMode;
+    public String clientVersion;
     public Integer mtu;
 
     @Override
@@ -75,12 +76,13 @@ public class SSHBean extends AbstractBean {
         if (udpgwMaxConnections == null) udpgwMaxConnections = 100;
         if (connectionCount == null) connectionCount = 1;
         if (mtuMode == null) mtuMode = MTU_MODE_DEFAULT;
+        if (clientVersion == null) clientVersion = "";
         if (mtu == null) mtu = 1400;
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(4);
+        output.writeInt(5);
         super.serialize(output);
         output.writeString(username);
         output.writeInt(authType);
@@ -104,6 +106,7 @@ public class SSHBean extends AbstractBean {
         output.writeInt(connectionCount);
         output.writeInt(mtuMode);
         output.writeInt(mtu);
+        output.writeString(clientVersion);
     }
 
     @Override
@@ -140,6 +143,9 @@ public class SSHBean extends AbstractBean {
             mtuMode = input.readInt();
             mtu = input.readInt();
         }
+        if (version >= 5) {
+            clientVersion = input.readString();
+        }
     }
 
 
@@ -157,6 +163,7 @@ public class SSHBean extends AbstractBean {
         bean.connectionCount = connectionCount;
         bean.mtuMode = mtuMode;
         bean.mtu = mtu;
+        bean.clientVersion = clientVersion;
     }
 
 

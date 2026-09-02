@@ -610,6 +610,9 @@
     <string name="hysteria2_omit_max_datagram_frame_size_sum">If the Hysteria 2 server does not support this breaking change, UDP will be unusable. This is a temporary option and may be removed in the future.</string>
     <string name="ssh_keepalive_interval">Keepalive interval (s)</string>
 
+    <string name="ssh_client_version">Client version banner</string>
+    <string name="ssh_client_version_sum">The identification string sent before the handshake, in clear text. Filtering that matches on it can let the connection open and then stall it, so posing as a common client sometimes gets traffic through. Must begin with "SSH-2.0-", for example SSH-2.0-OpenSSH_9.6. Leave empty for the default.</string>
+    <string name="ssh_client_version_invalid">The version banner must begin with "SSH-2.0-"</string>
     <string name="ssh_mtu">Tunnel MTU</string>
     <string name="ssh_mtu_mode">MTU for this profile</string>
     <string name="ssh_mtu_mode_default">Use the global setting</string>

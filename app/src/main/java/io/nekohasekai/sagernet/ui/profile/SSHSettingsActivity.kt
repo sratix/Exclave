@@ -20,6 +20,7 @@
 package io.nekohasekai.sagernet.ui.profile
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
@@ -29,6 +30,7 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.unwrapIDN
 
 class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
@@ -51,6 +53,7 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         DataStore.serverUdpgwPort = udpgwPort
         DataStore.serverUdpgwMaxConnections = udpgwMaxConnections
         DataStore.serverSSHConnectionCount = connectionCount
+        DataStore.serverSSHClientVersion = clientVersion
         DataStore.serverSSHMtuMode = mtuMode
         DataStore.serverSSHMtu = mtu
     }
@@ -79,6 +82,7 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         udpgwPort = DataStore.serverUdpgwPort
         udpgwMaxConnections = DataStore.serverUdpgwMaxConnections
         connectionCount = DataStore.serverSSHConnectionCount.coerceIn(1, 10)
+        clientVersion = DataStore.serverSSHClientVersion
         mtuMode = DataStore.serverSSHMtuMode
         mtu = DataStore.serverSSHMtu.coerceIn(576, 9000)
     }
@@ -105,6 +109,18 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         }
         findPreference<EditTextPreference>(Key.SERVER_SSH_CONNECTION_COUNT)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        }
+        findPreference<EditTextPreference>(Key.SERVER_SSH_CLIENT_VERSION)!!.apply {
+            // An SSH identification string that does not start with this is rejected before the
+            // handshake even begins, so reject it here rather than at connect time.
+            setOnPreferenceChangeListener { _, newValue ->
+                val text = (newValue as String).trim()
+                val valid = text.isEmpty() || text.startsWith("SSH-2.0-")
+                if (!valid) {
+                    Toast.makeText(app, R.string.ssh_client_version_invalid, Toast.LENGTH_LONG).show()
+                }
+                valid
+            }
         }
         val mtu = findPreference<EditTextPreference>(Key.SERVER_SSH_MTU)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Number)

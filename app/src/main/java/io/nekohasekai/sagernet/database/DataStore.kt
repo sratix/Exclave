@@ -416,6 +416,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverSSHConnectionCount by profileCacheStore.stringToInt(Key.SERVER_SSH_CONNECTION_COUNT) { 1 }
     var serverSSHMtuMode by profileCacheStore.stringToInt(Key.SERVER_SSH_MTU_MODE)
     var serverSSHMtu by profileCacheStore.stringToInt(Key.SERVER_SSH_MTU) { 1400 }
+    var serverSSHClientVersion by profileCacheStore.string(Key.SERVER_SSH_CLIENT_VERSION)
 
     var serverNaiveNoPostQuantum by profileCacheStore.boolean(Key.SERVER_NAIVE_NO_POST_QUANTUM)
     var serverSingUot by profileCacheStore.boolean(Key.SERVER_SING_UOT)

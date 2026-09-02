@@ -66,6 +66,14 @@
             app:title="@string/ssh_keepalive_interval"
             app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+            app:dialogMessage="@string/ssh_client_version_sum"
+            app:icon="@drawable/ic_baseline_person_24"
+            app:key="serverSSHClientVersion"
+            app:singleLineTitle="false"
+            app:title="@string/ssh_client_version"
+            app:useSimpleSummaryProvider="true" />
+
         <io.nekohasekai.sagernet.widget.SimpleMenuPreference
             app:entries="@array/ssh_mtu_mode"
             app:entryValues="@array/int_array_3"

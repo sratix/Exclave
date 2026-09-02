@@ -251,6 +251,7 @@ object Key {
     const val SERVER_SSH_CONNECTION_COUNT = "serverSSHConnectionCount"
     const val SERVER_SSH_MTU_MODE = "serverSSHMtuMode"
     const val SERVER_SSH_MTU = "serverSSHMtu"
+    const val SERVER_SSH_CLIENT_VERSION = "serverSSHClientVersion"
 
     const val SERVER_PORTS = "serverPorts"
     const val SERVER_HOP_INTERVAL = "serverHopInterval"
