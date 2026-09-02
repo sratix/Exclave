@@ -28,6 +28,7 @@ import android.os.LocaleList
 import androidx.preference.PreferenceDataStore
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.SagerNet.Companion.application
+import io.nekohasekai.sagernet.bg.UdpgwBridge
 import io.nekohasekai.sagernet.bg.VpnService
 import io.nekohasekai.sagernet.database.preference.InMemoryDatabase
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
@@ -258,6 +259,11 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     val persistAcrossReboot by configurationStore.boolean(Key.PERSIST_ACROSS_REBOOT)
 
+    var udpgwGlobalEnabled by configurationStore.boolean(Key.UDPGW_GLOBAL_ENABLED)
+    var udpgwGlobalAddress by configurationStore.string(Key.UDPGW_GLOBAL_ADDRESS) { "127.0.0.1" }
+    var udpgwGlobalPort by configurationStore.stringToInt(Key.UDPGW_GLOBAL_PORT) { UdpgwBridge.DEFAULT_PORT }
+    var udpgwGlobalMaxConnections by configurationStore.stringToInt(Key.UDPGW_GLOBAL_MAX_CONNECTIONS) { UdpgwBridge.DEFAULT_MAX_CONNECTIONS }
+
     var requireSocks by configurationStore.boolean(Key.REQUIRE_SOCKS) { true }
     var socksUsername by configurationStore.string(Key.SOCKS_USERNAME)
     var socksPassword by configurationStore.string(Key.SOCKS_PASSWORD)
@@ -403,6 +409,10 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverServerNameToVerify by profileCacheStore.string(Key.SERVER_SERVER_NAME_TO_VERIFY)
     var serverHysteria2OmitMaxDatagramFrameSize by profileCacheStore.boolean(Key.SERVER_HYSTERIA2_OMIT_MAX_DATAGRAM_FRAME_SIZE)
     var serverSSHKeepaliveInterval by profileCacheStore.stringToInt(Key.SERVER_SSH_KEEPALIVE_INTERVAL)
+    var serverUdpgwEnabled by profileCacheStore.boolean(Key.SERVER_UDPGW_ENABLED)
+    var serverUdpgwAddress by profileCacheStore.string(Key.SERVER_UDPGW_ADDRESS)
+    var serverUdpgwPort by profileCacheStore.stringToInt(Key.SERVER_UDPGW_PORT) { UdpgwBridge.DEFAULT_PORT }
+    var serverUdpgwMaxConnections by profileCacheStore.stringToInt(Key.SERVER_UDPGW_MAX_CONNECTIONS) { UdpgwBridge.DEFAULT_MAX_CONNECTIONS }
 
     var serverNaiveNoPostQuantum by profileCacheStore.boolean(Key.SERVER_NAIVE_NO_POST_QUANTUM)
     var serverSingUot by profileCacheStore.boolean(Key.SERVER_SING_UOT)

@@ -270,6 +270,30 @@
             app:key="profileSecurityAdvisory"
             app:summary="@string/insecure_warn_sum"
             app:title="@string/insecure_warn" />
+        <SwitchPreference
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="udpgwGlobalEnabled"
+            app:singleLineTitle="false"
+            app:summary="@string/udpgw_global_enable_sum"
+            app:title="@string/udpgw_global_enable" />
+        <EditTextPreference
+            app:defaultValue="127.0.0.1"
+            app:icon="@drawable/ic_hardware_router"
+            app:key="udpgwGlobalAddress"
+            app:title="@string/udpgw_address"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="7300"
+            app:icon="@drawable/ic_maps_directions_boat"
+            app:key="udpgwGlobalPort"
+            app:title="@string/udpgw_port"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="100"
+            app:icon="@drawable/ic_baseline_cached"
+            app:key="udpgwGlobalMaxConnections"
+            app:title="@string/udpgw_max_connections"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cag_dns">

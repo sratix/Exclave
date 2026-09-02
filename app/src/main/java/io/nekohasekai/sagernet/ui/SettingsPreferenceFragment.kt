@@ -371,6 +371,30 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         enableFragmentForDirect.isVisible = enableFragment.isChecked
         fragmentMethod.isVisible = enableFragment.isChecked
 
+        val udpgwGlobalEnabled = findPreference<SwitchPreference>(Key.UDPGW_GLOBAL_ENABLED)!!
+        val udpgwGlobalAddress = findPreference<EditTextPreference>(Key.UDPGW_GLOBAL_ADDRESS)!!.apply {
+            onPreferenceChangeListener = reloadListener
+        }
+        val udpgwGlobalPort = findPreference<EditTextPreference>(Key.UDPGW_GLOBAL_PORT)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+            onPreferenceChangeListener = reloadListener
+        }
+        val udpgwGlobalMaxConnections = findPreference<EditTextPreference>(Key.UDPGW_GLOBAL_MAX_CONNECTIONS)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+            onPreferenceChangeListener = reloadListener
+        }
+        fun updateUdpgwGlobal(enabled: Boolean) {
+            udpgwGlobalAddress.isVisible = enabled
+            udpgwGlobalPort.isVisible = enabled
+            udpgwGlobalMaxConnections.isVisible = enabled
+        }
+        updateUdpgwGlobal(udpgwGlobalEnabled.isChecked)
+        udpgwGlobalEnabled.setOnPreferenceChangeListener { _, newValue ->
+            updateUdpgwGlobal(newValue as Boolean)
+            needReload()
+            true
+        }
+
         // DNS settings
         findPreference<EditTextPreference>(Key.REMOTE_DNS)!!.onPreferenceChangeListener = reloadListener
         findPreference<ListPreference>(Key.REMOTE_DNS_QUERY_STRATEGY)!!.onPreferenceChangeListener = reloadListener

@@ -10,6 +10,7 @@ Features:
 - Group and subscription
 - Routing
 - Proxy chain
+- UDP over TCP through a badvpn-udpgw server, for TCP-only protocols such as SSH
 
 Some supported protocols:
 

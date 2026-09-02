@@ -67,4 +67,33 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/udpgw_settings">
+
+        <SwitchPreference
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="serverUdpgwEnabled"
+            app:singleLineTitle="false"
+            app:summary="@string/udpgw_enable_sum"
+            app:title="@string/udpgw_enable" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="serverUdpgwAddress"
+            app:title="@string/udpgw_address"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_maps_directions_boat"
+            app:key="serverUdpgwPort"
+            app:title="@string/udpgw_port"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_cached"
+            app:key="serverUdpgwMaxConnections"
+            app:title="@string/udpgw_max_connections"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

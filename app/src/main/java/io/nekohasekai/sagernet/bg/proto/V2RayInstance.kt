@@ -29,6 +29,7 @@ import io.nekohasekai.sagernet.RootCAProvider
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.bg.AbstractInstance
 import io.nekohasekai.sagernet.bg.GuardedProcessPool
+import io.nekohasekai.sagernet.bg.UdpgwBridge
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.fmt.LOCALHOST
@@ -56,6 +57,7 @@ abstract class V2RayInstance(
     val externalInstances = hashMapOf<Int, AbstractInstance>()
     open lateinit var processes: GuardedProcessPool
     private var cacheFiles = ArrayList<File>()
+    private var udpgwBridge: UdpgwBridge? = null
     fun isInitialized(): Boolean {
         return ::config.isInitialized
     }
@@ -144,6 +146,13 @@ abstract class V2RayInstance(
                 }
             }
         }
+        if (config.udpgwListenPort > 0) {
+            // Started before the core so the SOCKS listener already exists when the first UDP
+            // packet is dispatched; its own tunnel connection retries until the core is up.
+            udpgwBridge = UdpgwBridge(
+                config.udpgwListenPort, config.udpgwTunnelPort, config.udpgwMaxConnections
+            ).also { it.launch() }
+        }
         v2rayPoint.start()
         if (config.requireWs) {
             val url = "http://" + joinHostPort(LOCALHOST, config.wsPort) + "/"
@@ -229,6 +238,11 @@ abstract class V2RayInstance(
                     shForwarder.destroy()
                 }
             }
+        }
+
+        udpgwBridge?.let {
+            runCatching { it.close() }
+            udpgwBridge = null
         }
 
         if (::processes.isInitialized) processes.close(GlobalScope + Dispatchers.IO)

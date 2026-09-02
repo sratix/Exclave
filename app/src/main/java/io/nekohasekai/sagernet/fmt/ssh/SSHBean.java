@@ -42,6 +42,10 @@ public class SSHBean extends AbstractBean {
     public String privateKeyPassphrase;
     public String publicKey;
     public Integer keepaliveInterval;
+    public Boolean udpgwEnabled;
+    public String udpgwAddress;
+    public Integer udpgwPort;
+    public Integer udpgwMaxConnections;
 
     @Override
     public void initializeDefaultValues() {
@@ -56,11 +60,15 @@ public class SSHBean extends AbstractBean {
         if (privateKeyPassphrase == null) privateKeyPassphrase = "";
         if (publicKey == null) publicKey = "";
         if (keepaliveInterval == null) keepaliveInterval = 0;
+        if (udpgwEnabled == null) udpgwEnabled = false;
+        if (udpgwAddress == null) udpgwAddress = "127.0.0.1";
+        if (udpgwPort == null) udpgwPort = 7300;
+        if (udpgwMaxConnections == null) udpgwMaxConnections = 100;
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(1);
+        output.writeInt(2);
         super.serialize(output);
         output.writeString(username);
         output.writeInt(authType);
@@ -77,6 +85,10 @@ public class SSHBean extends AbstractBean {
         }
         output.writeString(publicKey);
         output.writeInt(keepaliveInterval);
+        output.writeBoolean(udpgwEnabled);
+        output.writeString(udpgwAddress);
+        output.writeInt(udpgwPort);
+        output.writeInt(udpgwMaxConnections);
     }
 
     @Override
@@ -100,6 +112,12 @@ public class SSHBean extends AbstractBean {
         if (version >= 1) {
             keepaliveInterval = input.readInt();
         }
+        if (version >= 2) {
+            udpgwEnabled = input.readBoolean();
+            udpgwAddress = input.readString();
+            udpgwPort = input.readInt();
+            udpgwMaxConnections = input.readInt();
+        }
     }
 
 
@@ -110,6 +128,10 @@ public class SSHBean extends AbstractBean {
             bean.publicKey = publicKey;
         }
         bean.keepaliveInterval = keepaliveInterval;
+        bean.udpgwEnabled = udpgwEnabled;
+        bean.udpgwAddress = udpgwAddress;
+        bean.udpgwPort = udpgwPort;
+        bean.udpgwMaxConnections = udpgwMaxConnections;
     }
 
 

@@ -124,6 +124,11 @@ object Key {
     const val REALITY_DISABLE_X25519MLKEM768 = "realityDisableX25519Mlkem768"
     const val HYSTERIA2_OMIT_MAX_DATAGRAM_FRAME_SIZE = "hysteria2OmitMaxDatagramFrameSize"
     const val GRPC_SERVICE_NAME_COMPAT = "grpcServiceNameCompat"
+
+    const val UDPGW_GLOBAL_ENABLED = "udpgwGlobalEnabled"
+    const val UDPGW_GLOBAL_ADDRESS = "udpgwGlobalAddress"
+    const val UDPGW_GLOBAL_PORT = "udpgwGlobalPort"
+    const val UDPGW_GLOBAL_MAX_CONNECTIONS = "udpgwGlobalMaxConnections"
     const val PROFILE_SECURITY_ADVISORY = "profileSecurityAdvisory"
 
     const val APP_TRAFFIC_STATISTICS = "appTrafficStatistics"
@@ -239,6 +244,10 @@ object Key {
     const val SERVER_SERVER_NAME_TO_VERIFY = "serverServerNameToVerify"
     const val SERVER_HYSTERIA2_OMIT_MAX_DATAGRAM_FRAME_SIZE = "serverHysteria2OmitMaxDatagramFrameSize"
     const val SERVER_SSH_KEEPALIVE_INTERVAL = "serverSSHKeepaliveInterval"
+    const val SERVER_UDPGW_ENABLED = "serverUdpgwEnabled"
+    const val SERVER_UDPGW_ADDRESS = "serverUdpgwAddress"
+    const val SERVER_UDPGW_PORT = "serverUdpgwPort"
+    const val SERVER_UDPGW_MAX_CONNECTIONS = "serverUdpgwMaxConnections"
 
     const val SERVER_PORTS = "serverPorts"
     const val SERVER_HOP_INTERVAL = "serverHopInterval"

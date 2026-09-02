@@ -23,6 +23,7 @@ import android.os.Bundle
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
@@ -45,6 +46,10 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         DataStore.serverPassword1 = privateKeyPassphrase
         DataStore.serverCertificates = publicKey
         DataStore.serverSSHKeepaliveInterval = keepaliveInterval
+        DataStore.serverUdpgwEnabled = udpgwEnabled
+        DataStore.serverUdpgwAddress = udpgwAddress
+        DataStore.serverUdpgwPort = udpgwPort
+        DataStore.serverUdpgwMaxConnections = udpgwMaxConnections
     }
 
     override fun SSHBean.serialize() {
@@ -66,6 +71,10 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         }
         publicKey = DataStore.serverCertificates
         keepaliveInterval = DataStore.serverSSHKeepaliveInterval
+        udpgwEnabled = DataStore.serverUdpgwEnabled
+        udpgwAddress = DataStore.serverUdpgwAddress
+        udpgwPort = DataStore.serverUdpgwPort
+        udpgwMaxConnections = DataStore.serverUdpgwMaxConnections
     }
 
     override fun PreferenceFragmentCompat.createPreferences(
@@ -88,6 +97,27 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         findPreference<EditTextPreference>(Key.SERVER_SSH_KEEPALIVE_INTERVAL)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
         }
+        findPreference<EditTextPreference>(Key.SERVER_UDPGW_PORT)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+        }
+        findPreference<EditTextPreference>(Key.SERVER_UDPGW_MAX_CONNECTIONS)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        }
+        val udpgwAddress = findPreference<EditTextPreference>(Key.SERVER_UDPGW_ADDRESS)!!
+        val udpgwPort = findPreference<EditTextPreference>(Key.SERVER_UDPGW_PORT)!!
+        val udpgwMaxConnections = findPreference<EditTextPreference>(Key.SERVER_UDPGW_MAX_CONNECTIONS)!!
+        val udpgwEnabled = findPreference<SwitchPreference>(Key.SERVER_UDPGW_ENABLED)!!
+        fun updateUdpgw(enabled: Boolean = DataStore.serverUdpgwEnabled) {
+            udpgwAddress.isVisible = enabled
+            udpgwPort.isVisible = enabled
+            udpgwMaxConnections.isVisible = enabled
+        }
+        updateUdpgw()
+        udpgwEnabled.setOnPreferenceChangeListener { _, newValue ->
+            updateUdpgw(newValue as Boolean)
+            true
+        }
+
         val authType = findPreference<ListPreference>(Key.SERVER_AUTH_TYPE)!!
         fun updateAuthType(type: Int = DataStore.serverAuthType) {
             password.isVisible = type == SSHBean.AUTH_TYPE_PASSWORD

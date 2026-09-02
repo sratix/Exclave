@@ -1,0 +1,11 @@
+#!/bin/sh
+# Linux/macOS launcher. Arguments are passed straight through to the bridge.
+# The jar sits next to this script in a release, and under build/ in a source tree.
+dir=$(dirname "$0")
+for jar in "$dir/udpgw-bridge.jar" "$dir/build/udpgw-bridge.jar"; do
+    if [ -f "$jar" ]; then
+        exec java -jar "$jar" "$@"
+    fi
+done
+echo "udpgw-bridge.jar not found; run $dir/build.sh first" >&2
+exit 1

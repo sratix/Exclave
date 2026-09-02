@@ -137,6 +137,9 @@ const val TAG_DIRECT = "direct"
 const val TAG_BYPASS = "bypass"
 const val TAG_BLOCK = "block"
 
+const val TAG_UDPGW_IN = "udpgw-in"
+const val TAG_UDPGW_OUT = "udpgw-out"
+
 const val TAG_DNS_IN = "dns-in"
 const val TAG_DNS_OUT = "dns-out"
 
@@ -161,6 +164,9 @@ class V2rayBuildResult(
     val dumpUID: Boolean,
     val alerts: List<Pair<Int, String>>,
     val useFakeDNS: Boolean,
+    val udpgwListenPort: Int = 0,
+    val udpgwTunnelPort: Int = 0,
+    val udpgwMaxConnections: Int = 0,
 ) {
     data class IndexEntity(var isBalancer: Boolean, var chain: LinkedHashMap<Triple<Int, String, String>, ProxyEntity>)
 }
@@ -572,6 +578,9 @@ fun buildV2RayConfig(
         }
 
         var rootBalancer: RoutingObject.RuleObject? = null
+        var udpgwListenPort = 0
+        var udpgwTunnelPort = 0
+        var udpgwMaxConnections = 0
         var rootObserver: MultiObservatoryObject.MultiObservatoryItem? = null
 
         fun buildChain(
@@ -2769,6 +2778,83 @@ fun buildV2RayConfig(
             })
         }
 
+        // UDP over TCP through a badvpn udpgw server, so that TCP-only outbounds such as SSH can
+        // still carry gaming, VoIP and DNS traffic. UDP is handed to a local bridge over SOCKS5,
+        // which re-frames it and sends it back in through a dokodemo-door pointed at the udpgw
+        // server, so the tunnel carries it like any other proxied TCP connection.
+        if (!forTest && !forExport) {
+            val udpgwSSHBean = proxies.mapNotNull { it.sshBean }.lastOrNull { it.udpgwEnabled }
+            val udpgwAddress: String
+            val udpgwServerPort: Int
+            when {
+                udpgwSSHBean != null -> {
+                    udpgwAddress = udpgwSSHBean.udpgwAddress
+                    udpgwServerPort = udpgwSSHBean.udpgwPort
+                    udpgwMaxConnections = udpgwSSHBean.udpgwMaxConnections
+                }
+                DataStore.udpgwGlobalEnabled -> {
+                    udpgwAddress = DataStore.udpgwGlobalAddress
+                    udpgwServerPort = DataStore.udpgwGlobalPort
+                    udpgwMaxConnections = DataStore.udpgwGlobalMaxConnections
+                }
+                else -> {
+                    udpgwAddress = ""
+                    udpgwServerPort = 0
+                }
+            }
+            if (udpgwAddress.isNotEmpty() && udpgwServerPort > 0) {
+                udpgwListenPort = mkPort()
+                udpgwTunnelPort = mkPort()
+
+                inbounds.add(InboundObject().apply {
+                    tag = TAG_UDPGW_IN
+                    listen = LOCALHOST
+                    port = udpgwTunnelPort
+                    protocol = "dokodemo-door"
+                    settings = LazyInboundConfigurationObject(this,
+                        DokodemoDoorInboundConfigurationObject().apply {
+                            address = udpgwAddress
+                            port = udpgwServerPort
+                            network = "tcp"
+                        })
+                })
+
+                outbounds.add(OutboundObject().apply {
+                    tag = TAG_UDPGW_OUT
+                    protocol = "socks"
+                    // udpgw addresses destinations by IP, so sniffed domains have to be resolved
+                    // before they reach the bridge.
+                    domainStrategy = "UseIP"
+                    settings = LazyOutboundConfigurationObject(this,
+                        SocksOutboundConfigurationObject().apply {
+                            servers = listOf(SocksOutboundConfigurationObject.ServerObject().apply {
+                                address = LOCALHOST
+                                port = udpgwListenPort
+                            })
+                        })
+                })
+
+                // The bridge's own connection has to reach the proxy whatever the user routes
+                // where, so it goes in front of everything.
+                routing.rules.add(0, RoutingObject.RuleObject().apply {
+                    type = "field"
+                    inboundTag = listOf(TAG_UDPGW_IN)
+                    if (mainIsBalancer) {
+                        balancerTag = "balancer-$TAG_AGENT"
+                    } else {
+                        outboundTag = tagProxy
+                    }
+                })
+                // Appended, so user rules still decide what is proxied, bypassed or blocked, and
+                // only the UDP that would otherwise have gone to the proxy takes the gateway.
+                routing.rules.add(RoutingObject.RuleObject().apply {
+                    type = "field"
+                    network = "udp"
+                    outboundTag = TAG_UDPGW_OUT
+                })
+            }
+        }
+
         if (routeMode == RouteMode.DIRECT) {
             routing.rules.add(0, RoutingObject.RuleObject().apply {
                 type = "field"
@@ -2822,6 +2908,9 @@ fun buildV2RayConfig(
             shouldDumpUID,
             alerts,
             DataStore.enableFakeDns,
+            udpgwListenPort,
+            udpgwTunnelPort,
+            udpgwMaxConnections,
         )
     }
 

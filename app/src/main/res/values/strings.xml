@@ -609,6 +609,15 @@
     <string name="hysteria2_omit_max_datagram_frame_size" translatable="false">OmitMaxDatagramFrameSize</string>
     <string name="hysteria2_omit_max_datagram_frame_size_sum">If the Hysteria 2 server does not support this breaking change, UDP will be unusable. This is a temporary option and may be removed in the future.</string>
     <string name="ssh_keepalive_interval">Keepalive interval (s)</string>
+
+    <string name="udpgw_settings">UDP gateway</string>
+    <string name="udpgw_enable">Enable UDP gateway</string>
+    <string name="udpgw_enable_sum">Carry UDP traffic over the tunnel using a badvpn-udpgw server, so TCP-only protocols such as SSH can still pass gaming, VoIP and DNS traffic.</string>
+    <string name="udpgw_global_enable">Enable UDP gateway for all profiles</string>
+    <string name="udpgw_global_enable_sum">Applies to every profile whose protocol cannot carry UDP on its own. A UDP gateway configured on the profile itself takes precedence.</string>
+    <string name="udpgw_address">UDP gateway address</string>
+    <string name="udpgw_port">UDP gateway port</string>
+    <string name="udpgw_max_connections">Max UDP connections</string>
     <string name="custom_outbound">Custom outbound</string>
     <string name="hysteria2_gecko_max_packet_size">Maximum packet size</string>
     <string name="hysteria2_gecko_min_packet_size">Minimum packet size</string>
