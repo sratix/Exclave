@@ -32,6 +32,7 @@ import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.fmt.ssh.SSHBean
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.database.StatsEntity
 import io.nekohasekai.sagernet.fmt.LOCALHOST
@@ -176,12 +177,38 @@ class VpnService : BaseVpnService(),
         override fun getLocalizedMessage() = getString(R.string.reboot_required)
     }
 
+    /**
+     * The MTU the tun is created with. A profile may override the global value, either with a fixed
+     * number or by deriving one from the MTU of the network the device is actually on, which is what
+     * catches carriers and links that run below 1500.
+     */
+    private fun resolveMtu(): Int {
+        val config = data.proxy?.config ?: return DataStore.mtu
+        return when (config.sshMtuMode) {
+            SSHBean.MTU_MODE_MANUAL -> config.sshMtu.coerceIn(576, 9000)
+            SSHBean.MTU_MODE_AUTO -> {
+                val linkMtu = runCatching {
+                    val network = underlyingNetwork ?: SagerNet.connectivity.activeNetwork
+                    SagerNet.connectivity.getLinkProperties(network)?.mtu?.takeIf { it > 0 }
+                }.getOrNull() ?: DEFAULT_MTU
+                (linkMtu - config.sshTunnelOverhead).coerceIn(576, 9000).also {
+                    Logs.i("vpn: auto MTU $it (link $linkMtu - overhead ${config.sshTunnelOverhead})")
+                }
+            }
+            else -> DataStore.mtu
+        }
+    }
+
+    /** The MTU the tun was actually created with, reused when configuring the core's stack. */
+    private var tunMtu = DEFAULT_MTU
+
     private fun startVpn() {
         instance = this
+        tunMtu = resolveMtu()
 
         val builder = Builder().setConfigureIntent(SagerNet.configureIntent(this))
             .setSession(getString(R.string.app_name))
-            .setMtu(DataStore.mtu)
+            .setMtu(tunMtu)
 
         builder.addAddress(PRIVATE_VLAN4_CLIENT, PRIVATE_VLAN4_CLIENT_PREFIX)
         if (DataStore.enableVPNInterfaceIPv6Address) {
@@ -291,7 +318,8 @@ class VpnService : BaseVpnService(),
         val config = TunConfig().apply {
             fileDescriptor = conn.fd
             protect = needIncludeSelf
-            mtu = DataStore.mtu
+            // Must match what the tun was created with, or the stack and the device disagree.
+            mtu = tunMtu
             discardICMP = DataStore.discardICMP
             v2Ray = data.proxy!!.v2rayPoint
             addr4 = PRIVATE_VLAN4_CLIENT

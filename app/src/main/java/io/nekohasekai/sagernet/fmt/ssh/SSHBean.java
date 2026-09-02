@@ -35,6 +35,12 @@ public class SSHBean extends AbstractBean {
     public static final int AUTH_TYPE_PASSWORD = 1;
     public static final int AUTH_TYPE_PUBLIC_KEY = 2;
 
+    /** Use the global VPN interface MTU. */
+    public static final int MTU_MODE_DEFAULT = 0;
+    /** Derive the MTU from the measured link MTU minus this profile's tunnel overhead. */
+    public static final int MTU_MODE_AUTO = 1;
+    public static final int MTU_MODE_MANUAL = 2;
+
     public String username;
     public Integer authType;
     public String password;
@@ -47,6 +53,8 @@ public class SSHBean extends AbstractBean {
     public Integer udpgwPort;
     public Integer udpgwMaxConnections;
     public Integer connectionCount;
+    public Integer mtuMode;
+    public Integer mtu;
 
     @Override
     public void initializeDefaultValues() {
@@ -66,11 +74,13 @@ public class SSHBean extends AbstractBean {
         if (udpgwPort == null) udpgwPort = 7300;
         if (udpgwMaxConnections == null) udpgwMaxConnections = 100;
         if (connectionCount == null) connectionCount = 1;
+        if (mtuMode == null) mtuMode = MTU_MODE_DEFAULT;
+        if (mtu == null) mtu = 1400;
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(4);
         super.serialize(output);
         output.writeString(username);
         output.writeInt(authType);
@@ -92,6 +102,8 @@ public class SSHBean extends AbstractBean {
         output.writeInt(udpgwPort);
         output.writeInt(udpgwMaxConnections);
         output.writeInt(connectionCount);
+        output.writeInt(mtuMode);
+        output.writeInt(mtu);
     }
 
     @Override
@@ -124,6 +136,10 @@ public class SSHBean extends AbstractBean {
         if (version >= 3) {
             connectionCount = input.readInt();
         }
+        if (version >= 4) {
+            mtuMode = input.readInt();
+            mtu = input.readInt();
+        }
     }
 
 
@@ -139,6 +155,8 @@ public class SSHBean extends AbstractBean {
         bean.udpgwPort = udpgwPort;
         bean.udpgwMaxConnections = udpgwMaxConnections;
         bean.connectionCount = connectionCount;
+        bean.mtuMode = mtuMode;
+        bean.mtu = mtu;
     }
 
 

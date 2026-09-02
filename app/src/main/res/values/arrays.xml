@@ -419,6 +419,12 @@
         <item>leastLoad</item>
     </string-array>
 
+    <string-array name="ssh_mtu_mode">
+        <item>@string/ssh_mtu_mode_default</item>
+        <item>@string/ssh_mtu_mode_auto</item>
+        <item>@string/ssh_mtu_mode_manual</item>
+    </string-array>
+
     <string-array name="int_array_3">
         <item>0</item>
         <item>1</item>

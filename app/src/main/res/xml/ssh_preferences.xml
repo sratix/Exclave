@@ -66,6 +66,22 @@
             app:title="@string/ssh_keepalive_interval"
             app:useSimpleSummaryProvider="true" />
 
+        <io.nekohasekai.sagernet.widget.SimpleMenuPreference
+            app:entries="@array/ssh_mtu_mode"
+            app:entryValues="@array/int_array_3"
+            app:icon="@drawable/ic_baseline_texture_24"
+            app:key="serverSSHMtuMode"
+            app:singleLineTitle="false"
+            app:title="@string/ssh_mtu_mode"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:dialogMessage="@string/ssh_mtu_sum"
+            app:icon="@drawable/ic_baseline_texture_24"
+            app:key="serverSSHMtu"
+            app:title="@string/ssh_mtu"
+            app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
             app:dialogMessage="@string/ssh_connection_count_sum"
             app:icon="@drawable/ic_baseline_compare_arrows_24"

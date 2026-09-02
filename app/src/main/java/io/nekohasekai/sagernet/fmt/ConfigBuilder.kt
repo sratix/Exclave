@@ -167,6 +167,9 @@ class V2rayBuildResult(
     val udpgwListenPort: Int = 0,
     val udpgwTunnelPort: Int = 0,
     val udpgwMaxConnections: Int = 0,
+    val sshMtuMode: Int = 0,
+    val sshMtu: Int = 0,
+    val sshTunnelOverhead: Int = 0,
 ) {
     data class IndexEntity(var isBalancer: Boolean, var chain: LinkedHashMap<Triple<Int, String, String>, ProxyEntity>)
 }
@@ -581,6 +584,9 @@ fun buildV2RayConfig(
         var udpgwListenPort = 0
         var udpgwTunnelPort = 0
         var udpgwMaxConnections = 0
+        var sshMtuMode = 0
+        var sshMtu = 0
+        var sshTunnelOverhead = 0
         var rootObserver: MultiObservatoryObject.MultiObservatoryItem? = null
 
         fun buildChain(
@@ -2834,6 +2840,21 @@ fun buildV2RayConfig(
             })
         }
 
+        // Per-profile MTU for the tun device. SSH itself has no MTU - it is a byte stream over TCP -
+        // so what this sizes is the packets apps put into the tunnel, not the connection to the SSH
+        // server, which the core gives us no socket option to resize.
+        run {
+            val mtuBean = proxies.mapNotNull { it.sshBean }.lastOrNull { it.mtuMode != SSHBean.MTU_MODE_DEFAULT }
+            if (mtuBean != null) {
+                sshMtuMode = mtuBean.mtuMode
+                sshMtu = mtuBean.mtu
+                // Outer IP + TCP, then the SSH binary packet (length, padding, MAC) and the channel
+                // data header, and the udpgw and SOCKS5 framing when the UDP gateway carries it.
+                val outerIp = if (mtuBean.serverAddress.contains(":")) 40 else 20
+                sshTunnelOverhead = outerIp + 20 + 29 + 9 + (if (mtuBean.udpgwEnabled) 21 else 0)
+            }
+        }
+
         // UDP over TCP through a badvpn udpgw server, so that TCP-only outbounds such as SSH can
         // still carry gaming, VoIP and DNS traffic. UDP is handed to a local bridge over SOCKS5,
         // which re-frames it and sends it back in through a dokodemo-door pointed at the udpgw
@@ -2967,6 +2988,9 @@ fun buildV2RayConfig(
             udpgwListenPort,
             udpgwTunnelPort,
             udpgwMaxConnections,
+            sshMtuMode,
+            sshMtu,
+            sshTunnelOverhead,
         )
     }
 

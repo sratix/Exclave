@@ -51,6 +51,8 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         DataStore.serverUdpgwPort = udpgwPort
         DataStore.serverUdpgwMaxConnections = udpgwMaxConnections
         DataStore.serverSSHConnectionCount = connectionCount
+        DataStore.serverSSHMtuMode = mtuMode
+        DataStore.serverSSHMtu = mtu
     }
 
     override fun SSHBean.serialize() {
@@ -77,6 +79,8 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         udpgwPort = DataStore.serverUdpgwPort
         udpgwMaxConnections = DataStore.serverUdpgwMaxConnections
         connectionCount = DataStore.serverSSHConnectionCount.coerceIn(1, 10)
+        mtuMode = DataStore.serverSSHMtuMode
+        mtu = DataStore.serverSSHMtu.coerceIn(576, 9000)
     }
 
     override fun PreferenceFragmentCompat.createPreferences(
@@ -101,6 +105,18 @@ class SSHSettingsActivity : ProfileSettingsActivity<SSHBean>() {
         }
         findPreference<EditTextPreference>(Key.SERVER_SSH_CONNECTION_COUNT)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        }
+        val mtu = findPreference<EditTextPreference>(Key.SERVER_SSH_MTU)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        }
+        val mtuMode = findPreference<ListPreference>(Key.SERVER_SSH_MTU_MODE)!!
+        fun updateMtuMode(mode: Int = DataStore.serverSSHMtuMode) {
+            mtu.isVisible = mode == SSHBean.MTU_MODE_MANUAL
+        }
+        updateMtuMode()
+        mtuMode.setOnPreferenceChangeListener { _, newValue ->
+            updateMtuMode((newValue as String).toInt())
+            true
         }
         findPreference<EditTextPreference>(Key.SERVER_UDPGW_PORT)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
