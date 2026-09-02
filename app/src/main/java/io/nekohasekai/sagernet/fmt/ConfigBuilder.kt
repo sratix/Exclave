@@ -2076,14 +2076,33 @@ fun buildV2RayConfig(
                             outbounds.add(clone)
                         }
 
+                        // Give the copies an observer, the same way a balancer profile does, so
+                        // that a session which drops is skipped instead of swallowing a share of
+                        // the traffic. The core falls back to the first outbound while no probe
+                        // has landed yet.
+                        val siblingObserver = MultiObservatoryObject.MultiObservatoryItem().apply {
+                            tag = "observer-$tagIn"
+                            settings = mutableMapOf<String, Any>()
+                            settings["probeURL"] = DataStore.connectionTestURL
+                            settings["probeInterval"] = "300s"
+                            settings["enableConcurrency"] = true
+                            settings["subjectSelector"] = HashSet(siblingTags)
+                        }
+                        if (multiObservatory == null) multiObservatory = MultiObservatoryObject().apply {
+                            observers = mutableListOf()
+                        }
+                        multiObservatory.observers.add(siblingObserver)
+
                         if (routing.balancers == null) routing.balancers = ArrayList()
                         routing.balancers.add(RoutingObject.BalancerObject().apply {
                             tag = "balancer-$tagIn"
                             selector = siblingTags
-                            // No observer is set up for these: they are the same server reached the
-                            // same way, so probing them against each other would only add traffic.
                             strategy = StrategyObject().apply {
                                 type = "random"
+                                settings = StrategyObject.strategyConfig().apply {
+                                    observerTag = "observer-$tagIn"
+                                    aliveOnly = true
+                                }
                             }
                         })
 
